@@ -1,0 +1,185 @@
+using System;
+					
+public class Program
+{
+  public static void Main()
+  {
+    Console.WriteLine("Hello World");
+    
+    ICanal whatsAppProfessor = new WhatsApp();
+    ICanal instaAluno = new Instagram();
+    ICanal numeroTelegram = new Telegram();
+    
+    //Criação de uma mensagem básica
+    MensagemBasica mensagem = new MensagemBasica();
+    mensagem.DataEnvio = DateTime.Now;
+    mensagem.Mensagem = "Olá";
+    
+    //Criação de uma mensagem de vídeo
+    Video mensagemVideo =  new Video();
+    mensagemVideo.DataEnvio = DateTime.Now;
+    mensagemVideo.Mensagem = "Olá - Mensagem de vídeo";
+    mensagemVideo.Arquivo = "fim de semana.mp4";
+    mensagemVideo.Formato = TiposDeArquivo.MP3;
+    mensagemVideo.Duracao = 60;
+
+    //Enviando mensagem de arquivo
+    MensagemArquivo mensagemArquivo = new MensagemArquivo();
+    mensagemArquivo.DataEnvio = DateTime.Now;
+    mensagemArquivo.Mensagem = "Olá - mensagem de arquivo";
+    mensagemArquivo.Arquivo = "documento.pdf";
+    mensagemArquivo.Formato = TiposDeArquivo.PDF;
+    mensagemArquivo.NomeArquivo = "Documento";				
+		
+    //Enviando mensagem básica
+    whatsAppProfessor.EnviarMensagem("+5511964687373", mensagem);
+    
+    //Enviando mensagem de vídeo
+    instaAluno.EnviarMensagem("+5511964687373", mensagemVideo);
+    
+    //Enviando mensagem de arquivo
+    instaAluno.EnviarMensagem("+5511964687373", mensagemArquivo);
+    
+    //Mensagem multimídia
+    MensagemMultimidia mensagemCaio = mensagemVideo;
+    mensagemCaio.Mensagem = "Olá, Caio!";
+    
+    //Mensagem ao usuário
+    ICanal facebook = new Facebook();
+    facebook.EnviarMensagem("usuarioDoCaio", mensagemCaio);
+      
+    ICanal canal = Factory.Create("facebook");    
+  }
+}
+
+
+public enum TiposDeArquivo
+{
+  MP3,
+  MP4,
+  PDF
+}
+
+
+public static class Factory
+{
+  public static ICanal Create(string canal)
+  {	
+    switch(canal)
+    {
+      case "whatsApp":
+        return new WhatsApp();
+      case "facebook":
+        return new Facebook();
+      default:
+      return null;
+    }	
+  }
+}
+
+
+public interface ICanal
+{
+  //Mensagem Básica
+  void EnviarMensagem(string destinatario, MensagemBasica mensagem);
+  
+  //Mensagem multimídia
+  void EnviarMensagem(string destinatario, MensagemMultimidia mensagem);
+  
+  //Mensagem de vídeo
+  void EnviarMensagem(string destinatario, Video mensagem);
+  
+  //Mensagem de arquivo
+  void EnviarMensagem(string destinatario, MensagemArquivo mensagem);
+}
+
+
+public abstract class CanaisMensagem : ICanal
+{
+  protected abstract string canal {get;}
+  
+  public void EnviarMensagem(string destinatario, MensagemBasica mensagem)
+  {
+  
+    Console.WriteLine("Mensagem básica enviada pelo canal: " + canal);
+    Console.WriteLine("Destinatário: "+ destinatario);
+    Console.WriteLine("Mensagem: "+ mensagem.Mensagem);
+    Console.WriteLine("Data Envio: "+ mensagem.DataEnvio);
+  }
+  
+  public void EnviarMensagem(string destinatario, MensagemMultimidia mensagem)
+  {
+    Console.WriteLine("Mensagem multimidia enviada pelo canal: " + canal);
+    Console.WriteLine("Destinatário: "+ destinatario);
+    Console.WriteLine("Mensagem: "+ mensagem.Mensagem);
+    Console.WriteLine("Data Envio: "+ mensagem.DataEnvio);
+    Console.WriteLine("Arquivo: "+ mensagem.Arquivo);
+    Console.WriteLine("Tipo Arquivo: "+ mensagem.Formato);		
+  }
+	
+  public void EnviarMensagem(string destinatario, Video mensagem)
+  {
+    Console.WriteLine("Mensagem video enviada pelo canal: " + canal);
+    Console.WriteLine("Destinatário: "+ destinatario);
+    Console.WriteLine("Mensagem: "+ mensagem.Mensagem);
+    Console.WriteLine("Data Envio: "+ mensagem.DataEnvio);
+    Console.WriteLine("Arquivo: "+ mensagem.Arquivo);
+    Console.WriteLine("Tipo Arquivo: "+ mensagem.Formato);	
+    Console.WriteLine("Duração: "+ mensagem.Duracao);	
+  }
+
+  public void EnviarMensagem(string destinatario, MensagemArquivo mensagem)
+  {
+    Console.WriteLine("Mensagem de arquivo enviada pelo canal: " + canal);
+    Console.WriteLine("Destinatário: " + destinatario);
+    Console.WriteLine("Mensagem: " + mensagem.Mensagem);
+    Console.WriteLine("Data Envio: " + mensagem.DataEnvio);
+    Console.WriteLine("Arquivo: " + mensagem.Arquivo);
+    Console.WriteLine("Tipo Arquivo: " + mensagem.Formato);
+    Console.WriteLine("Nome Arquivo: " + mensagem.NomeArquivo);
+  }
+}
+
+
+public class WhatsApp : CanaisMensagem, ICanal
+{
+  protected override string canal { get {return "Whats APP";}}
+}
+
+public class Telegram : CanaisMensagem, ICanal
+{
+  protected override string canal { get {return "Telegram";}}
+}
+
+public class Instagram : CanaisMensagem, ICanal
+{
+  protected override string canal { get {return "Instagram";}}
+}
+
+public class Facebook : CanaisMensagem, ICanal
+{
+  protected override string canal { get {return "Facebook";}}
+}
+
+
+public class MensagemBasica
+{
+  public string Mensagem {get; set;}
+  public DateTime DataEnvio {get; set;}
+}
+
+public class MensagemMultimidia : MensagemBasica
+{
+  public string Arquivo {get; set;}
+  public TiposDeArquivo Formato {get; set;}
+}
+
+public class Video : MensagemMultimidia
+{
+  public int Duracao {get; set;}
+}
+
+public class MensagemArquivo : MensagemMultimidia
+{
+    public string NomeArquivo { get; set; }
+}
